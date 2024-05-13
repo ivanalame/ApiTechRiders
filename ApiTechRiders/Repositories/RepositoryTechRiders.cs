@@ -28,6 +28,7 @@
 //CAMBIAR LOS NULL EN BBDD Y EN PROGRAM, SEGUIMIENTO...
 
 using ApiTechRiders.Data;
+using ApiTechRiders.Helpers;
 using ApiTechRiders.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,10 +37,12 @@ namespace ApiTechRiders.Repositories
     public class RepositoryTechRiders
     {
         private TechRidersContext context;
+        private HelperTokenPass helper;
 
-        public RepositoryTechRiders(TechRidersContext context)
+        public RepositoryTechRiders(TechRidersContext context,HelperTokenPass helper)
         {
             this.context = context;
+            this.helper = helper;
         }
 
         #region CHARLAS
@@ -1905,6 +1908,34 @@ namespace ApiTechRiders.Repositories
                 .ToListAsync();
         }
 
+        #endregion
+
+        #region MODIFICARPASS
+        
+           public async Task<string> RecuperarUsuarioAsync(string email)
+        {
+            Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == email);
+            if(usuario == null)
+            {
+                return null;
+            }
+            string codigo = helper.GenerarCodigoAsync();
+            usuario.TokenPass = codigo;
+            await this.context.SaveChangesAsync();
+            return codigo;
+        }
+        public async Task<Usuario> UpdatePasswordAsync(string email, string codigo, string password)
+        {
+            Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == email && x.TokenPass == codigo);
+            if (usuario != null)
+            {
+                usuario.TokenPass = null;
+                usuario.Password = password;
+                await this.context.SaveChangesAsync();
+            }
+
+            return usuario;
+        }
         #endregion
     }
 }

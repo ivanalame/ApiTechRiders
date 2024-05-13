@@ -3,6 +3,7 @@ using ApiTechRiders.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Newtonsoft.Json;
 using System.Security.Claims;
 
@@ -339,6 +340,57 @@ namespace ApiTechRiders.Controllers
             await this.repo.UpdateEmpresasCentrosResponsableAsync
                 (idempresacentro, idresponsable);
             return Ok();
+        }
+
+
+        //UPDATE PASSWORD 
+        // PUT: api/usuarios/UpdatePassword/{password}/{codigo}
+        /// <summary>
+        /// Modifica la password del usuario. TABLA USUARIOS
+        /// </summary>
+        /// <remarks>
+        /// Recibimos la nueva password
+        /// </remarks>
+        ///   /// <param name="email">Email del usuario que quiere modifcar</param>
+        /// <param name="password">Nueva password a Modificar</param>
+        /// <param name="codigo">codigo rebiciod</param>
+        /// <response code="201">Deleted. Objeto eliminado en la BBDD.</response> 
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>    
+        /// <response code="500">BBDD. No se ha eliminado el objeto en la BD. Error en la BBDD.</response>/// 
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPut]
+        [Route("[action]/{password}/{codigo}/{email}")]
+        public async Task<ActionResult> UpdatePassword(string email, string password,string codigo)
+        {
+            Usuario usuario = await this.repo.UpdatePasswordAsync(email,codigo,password);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        //Get CODIGO 
+        // PUT: api/usuarios/RecuperarTokenPass/{email}/
+        /// <summary>
+        /// Generar Codigo que le llega al usuario para modifcar su password. TABLA USUARIOS
+        /// </summary>
+        /// <remarks>
+        /// Recibimos la nueva password
+        /// </remarks>
+        /// <param name="email">Email del user que quiere modificar</param>
+        [HttpGet]
+        [Route("[action]/{email}")]
+        public async Task<ActionResult<string>> RecuperarTokenPass(string email)
+        {
+            string codigo = await this.repo.RecuperarUsuarioAsync(email);
+            if (codigo == null)
+            {
+                return NotFound();
+            }
+            return Ok(codigo);
         }
     }
 }

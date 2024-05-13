@@ -32,5 +32,7 @@ namespace ApiTechRiders.Models
         public int Estado { get;set; }
         [Column("LINKEDINVISIBLE")]
         public int LinkedInVisible { get; set; }
+        [Column("TOKENPASS")]
+        public string? TokenPass { get; set; }
     }
 }

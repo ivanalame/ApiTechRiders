@@ -17,7 +17,7 @@ builder.Services.AddProblemDetails();
 
 // Add services to the container.
 string connectionString =
-    builder.Configuration.GetConnectionString("SqlAzure");
+    builder.Configuration.GetConnectionString("SqlLocalivan");
 builder.Services.AddTransient<RepositoryTechRiders>();
 builder.Services.AddDbContext<TechRidersContext>
     (options => options.UseSqlServer(connectionString));
@@ -49,6 +49,7 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
     builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
 HelperToken helper = new HelperToken(builder.Configuration);
+builder.Services.AddTransient<HelperTokenPass>();
 //AÑADIMOS AUTENTIFICACION A NUESTRO SERVICIO
 builder.Services.AddAuthentication(helper.GetAuthOptions())
     .AddJwtBearer(helper.GetJwtOptions());
